@@ -1,0 +1,53 @@
+services:
+  # 1. MySQL Database Service
+  mysql:
+    image: mysql:8.0
+    container_name: lost_and_found_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: lost_and_found_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 2. Spring Boot Backend Service
+  backend:
+    build:
+      context: ./lost-and-found-backend
+      dockerfile: Dockerfile
+    container_name: lost_and_found_backend
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/lost_and_found_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      CORS_ALLOWED_ORIGINS: http://localhost,http://localhost:5173,http://localhost:80
+      PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  # 3. React Frontend Service (Nginx)
+  frontend:
+    build:
+      context: ./lost-and-found-frontend
+      dockerfile: Dockerfile
+    container_name: lost_and_found_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:

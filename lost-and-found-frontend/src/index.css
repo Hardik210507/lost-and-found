@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #EDE9DD;
+  color: #141414;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.font-serif-italic {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+}
+
+.mono-label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+table { border-collapse: collapse; width: 100%; }
