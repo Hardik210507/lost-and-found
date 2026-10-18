@@ -16,24 +16,29 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-bone border-b-[3px] border-ink">
       <div className="px-8 py-5 flex items-center justify-between flex-wrap gap-4">
-        <Link to={isAdmin ? "/admin" : "/"} className="font-serif-italic not-italic text-xl">
+        <Link to={isAdmin ? "/admin" : user ? "/" : "/auth"} className="font-serif-italic not-italic text-xl">
           Lost &amp; Found {isAdmin && <span className="text-amber not-italic text-sm font-sans font-bold ml-2">/ Admin Console</span>}
         </Link>
 
-        {/* Regular student navigation (hidden for admin) */}
-        {!isAdmin && (
-          <nav className="flex items-center gap-6 flex-wrap">
-            <NavLink to="/" end className={linkClass}>Manifest</NavLink>
-            <NavLink to="/post" className={linkClass}>Report</NavLink>
-            <NavLink to="/my-items" className={linkClass}>My items</NavLink>
-          </nav>
-        )}
+        {/* Only show nav links when authenticated */}
+        {user && (
+          <>
+            {/* Regular student navigation (hidden for admin) */}
+            {!isAdmin && (
+              <nav className="flex items-center gap-6 flex-wrap">
+                <NavLink to="/" end className={linkClass}>Manifest</NavLink>
+                <NavLink to="/post" className={linkClass}>Report</NavLink>
+                <NavLink to="/my-items" className={linkClass}>My items</NavLink>
+              </nav>
+            )}
 
-        {/* Admin only badge when logged in as admin */}
-        {isAdmin && (
-          <div className="mono-label text-[11px] font-bold text-amber border-2 border-amber bg-ink px-3 py-1">
-            Admin View Active
-          </div>
+            {/* Admin only badge when logged in as admin */}
+            {isAdmin && (
+              <div className="mono-label text-[11px] font-bold text-amber border-2 border-amber bg-ink px-3 py-1">
+                Admin View Active
+              </div>
+            )}
+          </>
         )}
 
         <div className="flex items-center gap-4">
