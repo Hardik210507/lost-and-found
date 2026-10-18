@@ -31,11 +31,8 @@ export default function Landing() {
       {/* Hero */}
       <section className="grid md:grid-cols-[1.3fr_1fr] border-b-[3px] border-ink">
         <div className="relative px-8 pt-16 pb-24 md:border-r-[3px] border-ink">
-          <div className="absolute top-14 -right-4 hidden md:block border-2 border-amber text-amber text-[10px] font-bold tracking-widest px-3 py-1.5 bg-ink rotate-6">
-            EST. THIS SEMESTER
-          </div>
           <div className="mono-label mb-4">
-            Campus property registry — <span className="text-amber">03 blocks covered</span>
+            Campus property registry — <span className="text-amber">{items.length} active record{items.length === 1 ? "" : "s"}</span>
           </div>
           <h1 className="font-serif-italic not-italic text-[13vw] md:text-7xl leading-[0.92] tracking-tight">
             You lost it.

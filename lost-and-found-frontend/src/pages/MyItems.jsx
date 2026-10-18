@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import ItemCard from "../components/ItemCard";
 import StatusBadge from "../components/StatusBadge";
 import { fetchItems, fetchClaims } from "../api/apiClient";
+import { useAuth } from "../context/AuthContext";
 
 const TABS = ["Lost items", "Found items", "Claims"];
 
 export default function MyItems() {
+  const { user } = useAuth();
   const [tab, setTab] = useState(0);
   const [items, setItems] = useState([]);
   const [claims, setClaims] = useState([]);
@@ -21,8 +23,11 @@ export default function MyItems() {
       .finally(() => setLoading(false));
   }, []);
 
-  const lost = items.filter((i) => i.type === "LOST");
-  const found = items.filter((i) => i.type === "FOUND");
+  const userItems = user?.name ? items.filter((i) => i.postedBy === user.name) : items;
+  const userClaims = user ? claims.filter((c) => c.claimant?.includes(user.name) || c.claimant?.includes(user.email)) : claims;
+
+  const lost = userItems.filter((i) => i.type === "LOST");
+  const found = userItems.filter((i) => i.type === "FOUND");
 
   return (
     <div>
@@ -50,7 +55,7 @@ export default function MyItems() {
           <>
             {tab === 0 && <ItemRows items={lost} />}
             {tab === 1 && <ItemRows items={found} />}
-            {tab === 2 && <ClaimRows claims={claims} />}
+            {tab === 2 && <ClaimRows claims={userClaims} />}
           </>
         )}
       </div>

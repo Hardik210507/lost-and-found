@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import StatusBadge from "../components/StatusBadge";
 import MatchCard from "../components/MatchCard";
 import { fetchItemById, fetchMatchesForItem, createClaim } from "../api/apiClient";
+import { useAuth } from "../context/AuthContext";
 
 export default function ItemDetail() {
   const { id } = useParams();
@@ -92,7 +93,9 @@ export default function ItemDetail() {
         <div className="p-8">
           <div className="mono-label mb-1.5">Possible matches</div>
           <div className="font-serif-italic not-italic text-2xl mb-5">This might be the same item</div>
-          {matches.map((m) => <MatchCard key={m.id || m.item?.id} item={m.item || m} score={m.score || 85} />)}
+          {matches.map((m) => (
+            <MatchCard key={m.id} item={m.matchedItem || m.item} score={m.score} />
+          ))}
         </div>
       )}
 
@@ -126,7 +129,8 @@ function Meta({ label, value }) {
 }
 
 function ClaimModal({ item, onClose, onSuccess }) {
-  const [claimant, setClaimant] = useState("");
+  const { user } = useAuth();
+  const [claimant, setClaimant] = useState(user ? `${user.name} (${user.email})` : "");
   const [detail, setDetail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState(null);

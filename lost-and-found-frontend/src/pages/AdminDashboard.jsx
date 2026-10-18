@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import StatCard from "../components/StatCard";
 import StatusBadge from "../components/StatusBadge";
-import { fetchItems, fetchClaims, updateClaimStatus } from "../api/apiClient";
+import { fetchItems, fetchClaims, updateClaimStatus, deleteItem } from "../api/apiClient";
 
 export default function AdminDashboard() {
   const [items, setItems] = useState([]);
@@ -25,11 +25,27 @@ export default function AdminDashboard() {
   const handleStatusChange = async (claimId, newStatus) => {
     try {
       await updateClaimStatus(claimId, newStatus);
+      const claim = claims.find((c) => c.id === claimId);
       setClaims((prev) =>
         prev.map((c) => (c.id === claimId ? { ...c, status: newStatus } : c))
       );
+      if (newStatus === "APPROVED" && claim?.item?.id) {
+        setItems((prev) =>
+          prev.map((i) => (i.id === claim.item.id ? { ...i, status: "RESOLVED" } : i))
+        );
+      }
     } catch (e) {
       alert("Failed to update status: " + e.message);
+    }
+  };
+
+  const handleDeleteItem = async (itemId) => {
+    if (!window.confirm("Are you sure you want to delete this item?")) return;
+    try {
+      await deleteItem(itemId);
+      setItems((prev) => prev.filter((i) => i.id !== itemId));
+    } catch (e) {
+      alert("Failed to delete item: " + e.message);
     }
   };
 
@@ -99,15 +115,24 @@ export default function AdminDashboard() {
               <th className="py-3 px-4 font-normal">Type</th>
               <th className="py-3 px-4 font-normal">Category</th>
               <th className="py-3 px-4 font-normal">Status</th>
+              <th className="py-3 px-4 font-normal text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {items.map((item) => (
               <tr key={item.id} className="border-b border-bone-dim last:border-0">
-                <td className="py-3.5 px-4">{item.title}</td>
+                <td className="py-3.5 px-4 font-medium">{item.title}</td>
                 <td className="py-3.5 px-4">{item.type}</td>
                 <td className="py-3.5 px-4">{item.category}</td>
                 <td className="py-3.5 px-4"><StatusBadge status={item.status} /></td>
+                <td className="py-3.5 px-4 text-right">
+                  <button
+                    onClick={() => handleDeleteItem(item.id)}
+                    className="px-3 py-1 border border-ink text-[11px] font-bold uppercase text-red-600 hover:bg-red-600 hover:text-white transition-colors"
+                  >
+                    Delete
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

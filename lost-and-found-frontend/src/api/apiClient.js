@@ -22,6 +22,13 @@ export async function createItem(itemData) {
   return res.json();
 }
 
+export async function deleteItem(id) {
+  const res = await fetch(`${API_BASE}/items/${id}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) throw new Error("Failed to delete item");
+}
+
 export async function fetchClaims() {
   const res = await fetch(`${API_BASE}/claims`);
   if (!res.ok) throw new Error("Failed to fetch claims");
@@ -56,4 +63,30 @@ export async function fetchMatchesForItem(itemId) {
   } catch {
     return [];
   }
+}
+
+export async function loginUser(credentials) {
+  const res = await fetch(`${API_BASE}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(credentials),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to log in");
+  }
+  return data;
+}
+
+export async function registerUser(userData) {
+  const res = await fetch(`${API_BASE}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(userData),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.error || "Failed to create account");
+  }
+  return data;
 }

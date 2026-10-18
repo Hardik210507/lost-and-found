@@ -2,15 +2,17 @@ import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { categories, locations } from "../data/mockItems";
 import { createItem } from "../api/apiClient";
+import { useAuth } from "../context/AuthContext";
 
 export default function PostItem() {
+  const { user } = useAuth();
   const [params] = useSearchParams();
   const [type, setType] = useState(params.get("type") === "found" ? "FOUND" : "LOST");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [location, setLocation] = useState("");
-  const [postedBy, setPostedBy] = useState("Anonymous User");
+  const [postedBy, setPostedBy] = useState(user?.name || "Student User");
   const [preview, setPreview] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,7 +20,38 @@ export default function PostItem() {
 
   function handleImage(e) {
     const file = e.target.files?.[0];
-    if (file) setPreview(URL.createObjectURL(file));
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          // Resize to max 800px width/height while keeping aspect ratio
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 800;
+
+          if (width > height && width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Compress to clean JPEG (~50-80KB)
+          const optimizedDataUrl = canvas.toDataURL("image/jpeg", 0.75);
+          setPreview(optimizedDataUrl);
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   async function handleSubmit(e) {
@@ -139,7 +172,7 @@ export default function PostItem() {
 
         <div className="p-8 flex items-center justify-center">
           <div className="border-[3px] border-ink p-6 w-full max-w-xs">
-            <div className="mono-label text-bone-muted mb-4">Entry No. 0007 — Preview</div>
+            <div className="mono-label text-bone-muted mb-4">New Entry — Live Preview</div>
             <div className="aspect-[4/3] border-2 border-dashed border-ink flex items-center justify-center text-xs text-[#888] mb-3.5 overflow-hidden">
               {preview ? <img src={preview} alt="preview" className="w-full h-full object-cover" /> : "Photo will appear here"}
             </div>

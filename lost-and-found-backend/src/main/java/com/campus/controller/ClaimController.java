@@ -11,9 +11,11 @@ import java.util.List;
 public class ClaimController {
 
     private final ClaimRepository claimRepository;
+    private final com.campus.repository.ItemRepository itemRepository;
 
-    public ClaimController(ClaimRepository claimRepository) {
+    public ClaimController(ClaimRepository claimRepository, com.campus.repository.ItemRepository itemRepository) {
         this.claimRepository = claimRepository;
+        this.itemRepository = itemRepository;
     }
 
     @GetMapping
@@ -31,7 +33,13 @@ public class ClaimController {
     public Claim updateClaimStatus(@PathVariable Long id, @RequestBody java.util.Map<String, String> body) {
         Claim claim = claimRepository.findById(id).orElseThrow(() -> new RuntimeException("Claim not found"));
         if (body.containsKey("status")) {
-            claim.setStatus(body.get("status"));
+            String newStatus = body.get("status");
+            claim.setStatus(newStatus);
+            if ("APPROVED".equalsIgnoreCase(newStatus) && claim.getItem() != null) {
+                com.campus.model.Item item = claim.getItem();
+                item.setStatus("RESOLVED");
+                itemRepository.save(item);
+            }
         }
         return claimRepository.save(claim);
     }
