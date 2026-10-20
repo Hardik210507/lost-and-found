@@ -7,7 +7,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/items")
-@CrossOrigin(origins = "http://localhost:5173") // Vite default port
+@CrossOrigin(originPatterns = "*")
 public class ItemController {
 
     private final ItemRepository itemRepository;

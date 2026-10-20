@@ -177,9 +177,18 @@ export default function PostItem() {
               {preview ? <img src={preview} alt="preview" className="w-full h-full object-cover" /> : "Photo will appear here"}
             </div>
             <label className="block border-2 border-dashed border-ink p-6 text-center text-xs text-[#4a4a4a] cursor-pointer">
-              Click to attach a photo (optional)
+              {preview ? "Click to change photo" : "Click to attach a photo (optional)"}
               <input type="file" accept="image/*" onChange={handleImage} className="hidden" />
             </label>
+            {preview && (
+              <button
+                type="button"
+                onClick={() => setPreview(null)}
+                className="mt-2 text-[10px] text-red-600 font-bold uppercase tracking-wider underline block text-center w-full hover:text-red-800"
+              >
+                Remove photo
+              </button>
+            )}
           </div>
         </div>
       </form>

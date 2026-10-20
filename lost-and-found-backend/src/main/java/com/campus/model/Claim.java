@@ -15,6 +15,8 @@ public class Claim {
     private Item item;
 
     private String claimant;
+
+    @Column(columnDefinition = "TEXT")
     private String identifyingDetail;
     private String status; // "PENDING", "APPROVED", "REJECTED"
 }

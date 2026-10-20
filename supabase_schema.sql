@@ -56,7 +56,8 @@ INSERT INTO app_user (name, email, password, role)
 VALUES ('Campus Administrator', 'admin@campus.edu', 'admin123', 'ADMIN')
 ON CONFLICT (email) DO NOTHING;
 
--- Optional: Enable Realtime on these tables if desired
--- ALTER PUBLICATION supabase_realtime ADD TABLE item;
--- ALTER PUBLICATION supabase_realtime ADD TABLE claim;
--- ALTER PUBLICATION supabase_realtime ADD TABLE app_user;
+-- Safe migration for existing databases created with Hibernate VARCHAR(255):
+ALTER TABLE IF EXISTS item ALTER COLUMN image_path TYPE TEXT;
+ALTER TABLE IF EXISTS item ALTER COLUMN description TYPE TEXT;
+ALTER TABLE IF EXISTS claim ALTER COLUMN identifying_detail TYPE TEXT;
+ALTER TABLE IF EXISTS notification ALTER COLUMN message TYPE TEXT;

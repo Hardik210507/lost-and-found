@@ -13,10 +13,13 @@ public class Item {
     
     private String type; // "LOST" or "FOUND"
     private String title;
+    @Column(columnDefinition = "TEXT")
     private String description;
     private String category;
     private String location;
     private String status; // "PENDING", "MATCHED", "RESOLVED"
+    
+    @Column(columnDefinition = "TEXT")
     private String imagePath;
     
     @Column(updatable = false)
