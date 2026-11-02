@@ -1,11 +1,13 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     try {
-      const saved = localStorage.getItem("laf_user");
+      // Clear any legacy persistent localStorage so previous sessions don't linger
+      localStorage.removeItem("laf_user");
+      const saved = sessionStorage.getItem("laf_user");
       return saved ? JSON.parse(saved) : null;
     } catch {
       return null;
@@ -14,11 +16,12 @@ export function AuthProvider({ children }) {
 
   const login = (userData) => {
     setUser(userData);
-    localStorage.setItem("laf_user", JSON.stringify(userData));
+    sessionStorage.setItem("laf_user", JSON.stringify(userData));
   };
 
   const logout = () => {
     setUser(null);
+    sessionStorage.removeItem("laf_user");
     localStorage.removeItem("laf_user");
   };
 
