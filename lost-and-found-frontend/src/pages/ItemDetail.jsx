@@ -94,7 +94,7 @@ export default function ItemDetail() {
           <div className="mono-label mb-1.5">Possible matches</div>
           <div className="font-serif-italic not-italic text-2xl mb-5">This might be the same item</div>
           {matches.map((m) => (
-            <MatchCard key={m.id} item={m.matchedItem || m.item} score={m.score} />
+            <MatchCard key={m.id} item={m.matchedItem || m.item} score={m.score} reason={m.reason} />
           ))}
         </div>
       )}

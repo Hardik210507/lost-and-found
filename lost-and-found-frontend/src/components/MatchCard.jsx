@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-export default function MatchCard({ item, score }) {
+export default function MatchCard({ item, score, reason }) {
   return (
     <Link
       to={`/items/${item.id}`}
@@ -15,6 +15,9 @@ export default function MatchCard({ item, score }) {
         <div className="h-1.5 bg-bone-dim mt-1.5">
           <div className="h-full bg-amber" style={{ width: `${score}%` }} />
         </div>
+        {reason && (
+          <div className="text-[10px] text-bone-muted mt-1">{reason}</div>
+        )}
       </div>
       <div className="font-serif-italic not-italic text-2xl text-amber text-right">{score}%</div>
     </Link>

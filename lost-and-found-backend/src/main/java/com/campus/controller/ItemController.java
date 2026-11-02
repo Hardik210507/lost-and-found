@@ -1,7 +1,10 @@
 package com.campus.controller;
 
 import com.campus.model.Item;
+import com.campus.repository.ClaimRepository;
 import com.campus.repository.ItemRepository;
+import com.campus.service.MatchingService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -11,11 +14,13 @@ import java.util.List;
 public class ItemController {
 
     private final ItemRepository itemRepository;
-    private final com.campus.service.MatchingService matchingService;
+    private final MatchingService matchingService;
+    private final ClaimRepository claimRepository;
 
-    public ItemController(ItemRepository itemRepository, com.campus.service.MatchingService matchingService) {
+    public ItemController(ItemRepository itemRepository, MatchingService matchingService, ClaimRepository claimRepository) {
         this.itemRepository = itemRepository;
         this.matchingService = matchingService;
+        this.claimRepository = claimRepository;
     }
 
     @GetMapping
@@ -42,10 +47,13 @@ public class ItemController {
     }
 
     @DeleteMapping("/{id}")
+    @Transactional
     public org.springframework.http.ResponseEntity<Void> deleteItem(@PathVariable Long id) {
         if (!itemRepository.existsById(id)) {
             return org.springframework.http.ResponseEntity.notFound().build();
         }
+        matchingService.removeMatchesFor(id);
+        claimRepository.deleteByItemId(id);
         itemRepository.deleteById(id);
         return org.springframework.http.ResponseEntity.noContent().build();
     }

@@ -19,4 +19,7 @@ public class ItemMatch {
     private Item matchedItem;
 
     private Integer score;
+
+    @Column(columnDefinition = "TEXT")
+    private String reason;
 }
