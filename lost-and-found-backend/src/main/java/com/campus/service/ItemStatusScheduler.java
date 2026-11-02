@@ -29,21 +29,26 @@ public class ItemStatusScheduler {
         this.claimRepository = claimRepository;
     }
 
-    /**
-     * Runs every day at midnight (server time).
-     * Cron expression: "0 0 0 * * *"  →  second=0, minute=0, hour=0, every day.
-     */
+    /** Triggered automatically every midnight. */
     @Scheduled(cron = "0 0 0 * * *")
-    @Transactional
     public void expireUnclaimed() {
-        LocalDateTime cutoff = LocalDateTime.now().minusDays(EXPIRY_DAYS);
+        runExpiry(EXPIRY_DAYS);
+    }
 
-        // Find all items that are still PENDING and were posted more than 7 days ago
+    /**
+     * Public method so the admin endpoint can call it on demand.
+     *
+     * @param days items older than this many days with no recent claim get marked UNRESOLVED
+     * @return number of items that were expired
+     */
+    @Transactional
+    public int runExpiry(int days) {
+        LocalDateTime cutoff = LocalDateTime.now().minusDays(days);
+
         List<Item> staleItems = itemRepository.findByStatusAndCreatedAtBefore("PENDING", cutoff);
 
         int expired = 0;
         for (Item item : staleItems) {
-            // Skip if a claim was filed within the last 7 days (give claimants a grace period)
             boolean hasRecentClaim = claimRepository.existsByItemIdAndCreatedAtAfter(item.getId(), cutoff);
             if (!hasRecentClaim) {
                 item.setStatus("UNRESOLVED");
@@ -52,8 +57,7 @@ public class ItemStatusScheduler {
             }
         }
 
-        if (expired > 0) {
-            System.out.println("[ItemStatusScheduler] Marked " + expired + " item(s) as UNRESOLVED (no claim in " + EXPIRY_DAYS + " days).");
-        }
+        System.out.println("[ItemStatusScheduler] runExpiry(" + days + "d): marked " + expired + " item(s) UNRESOLVED.");
+        return expired;
     }
 }

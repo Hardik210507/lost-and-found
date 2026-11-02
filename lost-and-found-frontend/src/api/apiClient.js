@@ -104,3 +104,16 @@ export async function registerUser(userData) {
   }
   return data;
 }
+
+/**
+ * Manually triggers the 7-day expiry job on the backend.
+ * @param {number} days - items older than this many days with no claim are marked UNRESOLVED.
+ *                        Pass 0 to expire ALL pending items with no claim immediately (for testing).
+ */
+export async function triggerExpireUnclaimed(days = 7) {
+  const res = await fetch(`${API_BASE}/admin/expire-unclaimed?days=${days}`, {
+    method: "POST",
+  });
+  if (!res.ok) throw await handleResponseError(res, "Failed to run expiry check");
+  return res.json();
+}

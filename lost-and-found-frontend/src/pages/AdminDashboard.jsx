@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import StatCard from "../components/StatCard";
 import StatusBadge from "../components/StatusBadge";
-import { fetchItems, fetchClaims, updateClaimStatus, deleteItem } from "../api/apiClient";
+import { fetchItems, fetchClaims, updateClaimStatus, deleteItem, triggerExpireUnclaimed } from "../api/apiClient";
 
 export default function AdminDashboard() {
   const [items, setItems] = useState([]);
   const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expiryRunning, setExpiryRunning] = useState(false);
+  const [expiryResult, setExpiryResult] = useState(null);
 
   const loadData = () => {
     Promise.all([fetchItems(), fetchClaims()])
@@ -39,6 +41,22 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleRunExpiry = async () => {
+    setExpiryRunning(true);
+    setExpiryResult(null);
+    try {
+      const result = await triggerExpireUnclaimed(7);
+      setExpiryResult(result);
+      // Reload items so the new UNRESOLVED badges appear
+      const updated = await fetchItems();
+      setItems(updated || []);
+    } catch (e) {
+      setExpiryResult({ message: "Error: " + e.message });
+    } finally {
+      setExpiryRunning(false);
+    }
+  };
+
   const handleDeleteItem = async (itemId) => {
     if (!window.confirm("Are you sure you want to delete this item?")) return;
     try {
@@ -62,7 +80,22 @@ export default function AdminDashboard() {
     <div>
       <div className="px-8 pt-12 pb-8 border-b-[3px] border-ink">
         <div className="mono-label mb-2">Overview</div>
-        <h1 className="font-serif-italic not-italic text-5xl">Admin dashboard.</h1>
+        <div className="flex items-end justify-between flex-wrap gap-4">
+          <h1 className="font-serif-italic not-italic text-5xl">Admin dashboard.</h1>
+          <div className="flex flex-col items-end gap-1.5">
+            <button
+              id="btn-run-expiry"
+              onClick={handleRunExpiry}
+              disabled={expiryRunning}
+              className="px-4 py-2 border-2 border-ink text-[11px] font-bold uppercase tracking-wide hover:bg-ink hover:text-bone transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {expiryRunning ? "Running…" : "⏱ Run Expiry Check"}
+            </button>
+            {expiryResult && (
+              <span className="text-[10px] mono-label text-[#666]">{expiryResult.message}</span>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-5 border-b-[3px] border-ink">
