@@ -84,9 +84,33 @@ export default function AdminDashboard() {
         ) : (
           pendingClaims.map((c) => (
             <div key={c.id} className="border-2 border-ink p-5 mb-3.5">
-              <div className="flex justify-between mb-2">
-                <span className="font-serif-italic not-italic text-lg">{c.item?.title || "Item #" + c.item?.id}</span>
-                <span className="mono-label text-[#888] font-medium">Claimed by {c.claimant}</span>
+              <div className="flex justify-between items-start mb-2 gap-4 flex-wrap">
+                <div>
+                  <span className="font-serif-italic not-italic text-lg">{c.item?.title || "Item #" + c.item?.id}</span>
+                  <div className="mono-label text-[#888] font-medium text-xs mt-0.5">Claimed by {c.claimant}</div>
+                </div>
+                <div className="text-right">
+                  <div className="flex items-center gap-2 justify-end">
+                    <span className="mono-label text-[10px] text-[#888] uppercase">Verification Score:</span>
+                    <span className={`px-2 py-0.5 text-xs font-bold border border-ink ${
+                      (c.matchScore ?? 0) >= 70 ? "bg-green-100 text-green-900" :
+                      (c.matchScore ?? 0) >= 40 ? "bg-amber/30 text-ink" :
+                      "bg-black/5 text-[#666]"
+                    }`}>
+                      {c.matchScore ?? 0} / 100
+                    </span>
+                  </div>
+                  <div className="w-28 h-1.5 bg-bone-dim mt-1.5 ml-auto border border-ink/20">
+                    <div
+                      className={`h-full ${
+                        (c.matchScore ?? 0) >= 70 ? "bg-green-600" :
+                        (c.matchScore ?? 0) >= 40 ? "bg-amber" :
+                        "bg-black/30"
+                      }`}
+                      style={{ width: `${c.matchScore ?? 0}%` }}
+                    />
+                  </div>
+                </div>
               </div>
               <p className="text-xs italic text-[#4a4a4a] border-l-[3px] border-amber pl-3 my-2.5">"{c.identifyingDetail}"</p>
               <div className="flex gap-2.5">

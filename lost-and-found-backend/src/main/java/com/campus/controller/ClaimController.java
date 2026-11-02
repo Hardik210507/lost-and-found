@@ -26,7 +26,40 @@ public class ClaimController {
     @PostMapping
     public Claim createClaim(@RequestBody Claim claim) {
         if (claim.getStatus() == null) claim.setStatus("PENDING");
+        int score = calculateClaimScore(claim);
+        claim.setMatchScore(score);
         return claimRepository.save(claim);
+    }
+
+    private int calculateClaimScore(Claim claim) {
+        if (claim.getIdentifyingDetail() == null || claim.getIdentifyingDetail().isBlank()) {
+            return 0;
+        }
+        if (claim.getItem() == null || claim.getItem().getId() == null) {
+            return 0;
+        }
+        com.campus.model.Item item = itemRepository.findById(claim.getItem().getId()).orElse(null);
+        if (item == null) {
+            return 0;
+        }
+
+        java.util.Set<String> claimWords = com.campus.service.MatchScorer.keywords(claim.getIdentifyingDetail());
+        String itemText = (item.getTitle() != null ? item.getTitle() : "") + " " + (item.getDescription() != null ? item.getDescription() : "");
+        java.util.Set<String> itemWords = com.campus.service.MatchScorer.keywords(itemText);
+
+        if (claimWords.isEmpty() || itemWords.isEmpty()) {
+            return 0;
+        }
+
+        java.util.Set<String> shared = new java.util.HashSet<>(claimWords);
+        shared.retainAll(itemWords);
+
+        if (shared.isEmpty()) {
+            return 0;
+        }
+
+        double ratio = (double) shared.size() / claimWords.size();
+        return (int) Math.min(100, Math.round(ratio * 100));
     }
 
     @PatchMapping("/{id}/status")

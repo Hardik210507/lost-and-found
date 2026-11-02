@@ -85,10 +85,17 @@ function ClaimRows({ claims }) {
       {claims.map((c) => (
         <div key={c.id} className="border-2 border-ink p-5">
           <div className="flex justify-between items-center">
-            <span className="font-serif-italic not-italic text-lg">{c.item.title}</span>
-            <StatusBadge status="PENDING" />
+            <span className="font-serif-italic not-italic text-lg">{c.item?.title || "Item #" + c.item?.id}</span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-mono font-bold text-amber">
+                Score: {c.matchScore ?? 0} / 100
+              </span>
+              <StatusBadge status={c.status || "PENDING"} />
+            </div>
           </div>
-          <p className="text-xs text-[#4a4a4a] mt-1">Awaiting admin verification</p>
+          <p className="text-xs text-[#4a4a4a] mt-1">
+            {c.status === "APPROVED" ? "Claim approved by admin" : c.status === "REJECTED" ? "Claim rejected" : "Awaiting admin verification"}
+          </p>
         </div>
       ))}
     </div>

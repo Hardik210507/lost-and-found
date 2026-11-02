@@ -19,4 +19,7 @@ public class Claim {
     @Column(columnDefinition = "TEXT")
     private String identifyingDetail;
     private String status; // "PENDING", "APPROVED", "REJECTED"
+
+    @Column(name = "match_score")
+    private Integer matchScore = 0;
 }
