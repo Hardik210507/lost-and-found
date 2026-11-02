@@ -52,9 +52,10 @@ export default function AdminDashboard() {
   const totalItems = items.length;
   const resolvedCount = items.filter((i) => i.status === "RESOLVED").length;
   const pendingCount = items.filter((i) => i.status === "PENDING").length;
+  const unresolvedCount = items.filter((i) => i.status === "UNRESOLVED").length;
   const lostCount = items.filter((i) => i.type === "LOST").length;
   const foundCount = items.filter((i) => i.type === "FOUND").length;
-  const maxCount = Math.max(lostCount, foundCount, 1);
+  const maxCount = Math.max(lostCount, foundCount, unresolvedCount, 1);
   const pendingClaims = claims.filter((c) => c.status === "PENDING");
 
   return (
@@ -64,10 +65,11 @@ export default function AdminDashboard() {
         <h1 className="font-serif-italic not-italic text-5xl">Admin dashboard.</h1>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 border-b-[3px] border-ink">
+      <div className="grid grid-cols-2 md:grid-cols-5 border-b-[3px] border-ink">
         <StatCard label="Total items" value={totalItems} />
         <StatCard label="Resolved" value={resolvedCount} />
         <StatCard label="Pending" value={pendingCount} />
+        <StatCard label="Unresolved" value={unresolvedCount} />
         <StatCard label="Active Claims" value={claims.length} />
       </div>
 
@@ -75,6 +77,9 @@ export default function AdminDashboard() {
         <div className="mono-label mb-4">Lost vs found</div>
         <Bar label="Lost" value={lostCount} max={maxCount} color="bg-ink" />
         <Bar label="Found" value={foundCount} max={maxCount} color="bg-amber" />
+        {unresolvedCount > 0 && (
+          <Bar label="Expired" value={unresolvedCount} max={maxCount} color="bg-red-400" />
+        )}
 
         <div className="mono-label mt-9 mb-4">Pending claims</div>
         {loading ? (

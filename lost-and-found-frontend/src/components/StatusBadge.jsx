@@ -3,6 +3,7 @@ const STYLES = {
   MATCHED: "bg-ink text-bone border-ink",
   CLAIMED: "bg-ink text-bone border-ink",
   RESOLVED: "bg-amber text-ink border-ink",
+  UNRESOLVED: "bg-red-100 text-red-700 border-red-400",
 };
 
 const LABELS = {
@@ -10,6 +11,7 @@ const LABELS = {
   MATCHED: "Matched",
   CLAIMED: "Claimed",
   RESOLVED: "Resolved",
+  UNRESOLVED: "Unresolved",
 };
 
 export default function StatusBadge({ status }) {

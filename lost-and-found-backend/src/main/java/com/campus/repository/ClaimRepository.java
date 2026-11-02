@@ -3,6 +3,7 @@ package com.campus.repository;
 import com.campus.model.Claim;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ClaimRepository extends JpaRepository<Claim, Long> {
@@ -10,4 +11,6 @@ public interface ClaimRepository extends JpaRepository<Claim, Long> {
 
     @Transactional
     void deleteByItemId(Long itemId);
+
+    boolean existsByItemIdAndCreatedAtAfter(Long itemId, LocalDateTime since);
 }
